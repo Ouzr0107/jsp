@@ -37,7 +37,7 @@ import { ref } from "vue";
 import "github-markdown-css";
 import router from "@/router";
 
-const content = ref("");
+const content = ref();
 const satoken = localStorage.getItem("satoken");
 
 const createColumns = () => {

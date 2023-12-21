@@ -52,18 +52,20 @@ const blogs = ref({});
 const page = ref(1);
 const pages = ref(1);
 const key = route.query.keyWords as string;
+const type = route.query.keyType as string;
 
 if (key) {
-  getSearchPage(key);
+  getSearchPage();
 } else {
   getPage();
 }
 
-function getSearchPage(keyWords: string) {
+function getSearchPage() {
   axios
     .post("/blog/search", {
       page: page.value,
-      keyWords: keyWords,
+      keyWords: key,
+      type: type,
     })
     .then((res) => {
       const pageData = res.data.data;
@@ -84,9 +86,9 @@ function getPage() {
     });
 }
 
-watch(page, (newPage) => {
+watch(page, () => {
   if (key) {
-    getSearchPage(key);
+    getSearchPage();
   } else {
     getPage();
   }

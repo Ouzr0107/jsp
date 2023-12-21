@@ -14,5 +14,9 @@ export const useUserStore = defineStore("userInfo", () => {
     Token.value = "";
   }
 
-  return { Token, setToken, removeInfo };
+  function saveTheme(theme: string) {
+    localStorage.setItem("themeToken", theme);
+  }
+
+  return { Token, setToken, removeInfo, saveTheme};
 });

@@ -84,46 +84,32 @@ const md = ref();
 
 const options = [
   {
-    label: "default",
+    label: "默认",
     value: "default",
   },
   {
-    label: "tertiary",
-    value: "tertiary",
-    style: {
-      color: "#767c82",
-    },
-  },
-  {
-    label: "primary",
-    value: "primary",
-    style: {
-      color: "#18a058",
-    },
-  },
-  {
-    label: "info",
+    label: "信息",
     value: "info",
     style: {
       color: "#2080f0",
     },
   },
   {
-    label: "success",
+    label: "成功",
     value: "success",
     style: {
       color: "#18a058",
     },
   },
   {
-    label: "warning",
+    label: "警告",
     value: "warning",
     style: {
       color: "#f0a020",
     },
   },
   {
-    label: "error",
+    label: "错误",
     value: "error",
     style: {
       color: "#d03050",

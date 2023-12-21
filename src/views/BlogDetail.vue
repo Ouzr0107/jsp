@@ -71,18 +71,8 @@ const route = useRoute();
 const router = useRouter();
 const satoken = localStorage.getItem("satoken");
 const ownBlog = ref(false);
-const blog = ref({
-  id: 0,
-  blogId: 0,
-  category: "",
-  comments: [],
-  content: "",
-  created: "",
-  updated: "",
-  title: "",
-  type: "",
-  username: "",
-});
+
+const blog = ref();
 
 const myComment = ref({
   userId: 0,

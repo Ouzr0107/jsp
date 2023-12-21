@@ -3,65 +3,103 @@
     <n-space vertical size="large">
       <n-layout style="height: 100%" position="absolute">
         <n-layout-header style="height: 64px; padding: 1rem" bordered>
-          <n-gradient-text :size="24" type="success">
-            <b>博客系统</b>
-            <span
-              ><n-input
-                style="margin-left: 2rem; width: 10rem"
+          <n-space justify="space-between">
+            <n-gradient-text :size="24" type="success">
+              <b>博客系统</b>
+            </n-gradient-text>
+            <n-space>
+              <n-select
+                v-model:value="searchType"
+                :options="options"
+                placeholder="类型"
+                style="margin-left: 2rem; width: 5rem"
+              />
+              <n-input
+                style="width: 10rem"
                 v-model:value="searchText"
                 type="text"
                 placeholder="搜索"
-                @change="searchBlogs" />
+                @change="searchBlogs"
+              />
               <n-button
+                style="margin-top: -0.1rem"
                 text
                 @click="searchBlogs"
                 type="primary"
-                style="position: absolute; margin-left: 0.5rem"
               >
-                <n-icon size="40">
+                <n-icon size="36">
                   <SearchCircle />
-                </n-icon> </n-button
-            ></span>
-          </n-gradient-text>
-          <n-space inline style="right: 1rem; position: absolute">
-            <n-button text v-if="!theme" @click="theme = darkTheme"
-              ><n-icon size="36"> <Bulb /> </n-icon
-            ></n-button>
-            <n-button text v-else @click="theme = null"
-              ><n-icon size="36"> <BulbOutline /> </n-icon
-            ></n-button>
-            <n-button text @click="showPanel = true" type="primary" v-if="show">
-              <n-icon size="36">
-                <log-in />
-              </n-icon>
-            </n-button>
-            <n-modal
-              v-model:show="showPanel"
-              title="账号"
-              preset="card"
-              :style="panel"
-            >
-              <n-tabs
-                class="card-tabs"
-                default-value="signin"
-                size="large"
-                animated
-                style="margin: 0 -4px"
-                pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;"
+                </n-icon>
+              </n-button>
+            </n-space>
+
+            <span style="float: right; margin-top: -0.2rem">
+              <n-button
+                text
+                v-if="!theme"
+                @click="
+                  theme = darkTheme;
+                  store.saveTheme('dark');
+                "
               >
-                <n-tab-pane name="signin" tab="登录">
-                  <Login></Login>
-                </n-tab-pane>
-                <n-tab-pane name="signup" tab="注册">
-                  <Register></Register>
-                </n-tab-pane>
-              </n-tabs>
-            </n-modal>
-            <n-button text @click="logout" type="error" v-if="!show"
-              ><n-icon size="36"> <log-out /> </n-icon
-            ></n-button>
+                <n-icon size="36">
+                  <Bulb />
+                </n-icon>
+              </n-button>
+              <n-button
+                text
+                v-else
+                @click="
+                  theme = null;
+                  store.saveTheme('light');
+                "
+              >
+                <n-icon size="36">
+                  <BulbOutline />
+                </n-icon>
+              </n-button>
+              <n-button
+                text
+                @click="showPanel = true"
+                type="primary"
+                v-if="show"
+              >
+                <n-icon size="36">
+                  <log-in />
+                </n-icon>
+              </n-button>
+              <n-button text @click="logout" type="error" v-if="!show">
+                <n-icon size="36">
+                  <log-out />
+                </n-icon>
+              </n-button>
+            </span>
           </n-space>
+
+          <n-modal
+            v-model:show="showPanel"
+            title="账号"
+            preset="card"
+            :style="panel"
+          >
+            <n-tabs
+              class="card-tabs"
+              default-value="signin"
+              size="large"
+              animated
+              style="margin: 0 -4px"
+              pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;"
+            >
+              <n-tab-pane name="signin" tab="登录">
+                <Login></Login>
+              </n-tab-pane>
+              <n-tab-pane name="signup" tab="注册">
+                <Register></Register>
+              </n-tab-pane>
+            </n-tabs>
+          </n-modal>
         </n-layout-header>
+
         <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
           <n-layout-sider
             collapse-mode="width"
@@ -128,6 +166,7 @@ import {
   type MenuOption,
   useOsTheme,
   darkTheme,
+  lightTheme,
 } from "naive-ui";
 import { useUserStore } from "@/stores";
 import router from "@/router";
@@ -154,14 +193,31 @@ const show = ref(true);
 const avatar = ref("");
 const username = ref("");
 const osThemeRef = useOsTheme();
-const theme = ref(osThemeRef.value === "dark" ? darkTheme : null);
+const theme = ref();
 const isRefreshed = ref(true);
 const searchText = ref("");
+const searchType = ref("title");
 const Category = ref<MenuOption[]>([]);
 const route = useRoute();
 const num = ref(0);
 
 const satoken = localStorage.getItem("satoken");
+const themeToken = localStorage.getItem("themeToken");
+
+const options = [
+  {
+    label: "标题",
+    value: "title",
+  },
+  {
+    label: "介绍",
+    value: "description",
+  },
+  {
+    label: "作者",
+    value: "username",
+  },
+];
 
 interface blog {
   blogId: string;
@@ -181,6 +237,13 @@ if (satoken) {
   axios.get("/blog/num").then((res) => {
     num.value = res.data.data;
   });
+}
+
+if (themeToken) {
+  theme.value = themeToken === "dark" ? darkTheme : lightTheme;
+} else {
+  theme.value = osThemeRef.value === "dark" ? darkTheme : lightTheme;
+  store.saveTheme(osThemeRef.value!);
 }
 
 const panel = ref({
@@ -286,7 +349,13 @@ const menuOptions: MenuOption[] = [
 ];
 
 function searchBlogs() {
-  router.push({ name: "Blogs", query: { keyWords: searchText.value } });
+  router.push({
+    name: "Blogs",
+    query: {
+      keyType: searchType.value,
+      keyWords: searchText.value,
+    },
+  });
 }
 </script>
 
